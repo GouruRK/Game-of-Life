@@ -18,20 +18,55 @@ function get_size() {
 function load_grid(rows, columns) {
     let line;
     let grid = document.getElementById("grid");
-    for (let i=0; i <= columns; i++) {
+    for (let y=0; y < columns; y++) {
         line = document.createElement("div");
-        for (let j = 0; j <= rows; j++) {
-            line.innerHTML += `<div class="cell white" id="${i}-${j}" onclick=change_status(event)></div>`;
+        for (let x = 0; x < rows; x++) {
+            line.innerHTML += `<div class="cell white" id="${x}-${y}" onclick=click_on_cell(event)></div>`;
         }
         grid.appendChild(line);
     }
 }
 
-function change_status(event) {
-    if (event.target.className.split(" ")[1] == "white") {
-        
-        event.target.className = "cell black";
+function click_on_cell(event) {
+    return change_status(event.target)
+}
+
+function change_status(element) {
+    if (element.className.split(" ")[1] == "white") {
+        element.className = "cell black";
     } else {
-        event.target.className = "cell white";
+        element.className = "cell white";
     }
+}
+
+function count(list, element) {
+    return list.reduce((prev, curr) => {
+        if (curr == element) {
+            return prev + 1
+        }
+        return prev
+    }, 0)
+}
+
+function get_neighbor(x, y) {
+    let neighbors = [
+        [x - 1, y - 1],
+        [x, y - 1],
+        [x + 1, y - 1],
+        [x + 1, y],
+        [x + 1, y + 1],
+        [x, y + 1],
+        [x - 1, y + 1],
+        [x - 1, y]
+    ]
+    let colors = [];
+    let abscissa;
+    let ordinate;
+    let cell;
+    neighbors.forEach(neighbor => {
+        abscissa = neighbor[0];
+        ordinate = neighbor[1];
+        cell = document.getElementById(`${abscissa}-${ordinate}`);
+        colors.push(cell.className[1]);
+    });
 }
