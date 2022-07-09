@@ -31,4 +31,12 @@ html, body {
 
 #one_step {
     display: none;
-} 
+}
+
+#play {
+    display: none;
+}
+
+#stop {
+    display: none;
+}

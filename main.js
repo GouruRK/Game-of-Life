@@ -5,8 +5,13 @@
 1 -> live -> black
 */
 
+let interval;
+let steps = 0;
+
 document.getElementById("one_step").addEventListener("click", add_step);
 document.getElementById("validate").addEventListener("click", init);
+document.getElementById("play").addEventListener("click", play);
+document.getElementById("stop").addEventListener("click", stop_interval);
 
 let grid = [];
 let rows;
@@ -17,6 +22,8 @@ function hide_inputs() {
     document.getElementById("columns").style.display = "none";
     document.getElementById("validate").style.display = "none";
     document.getElementById("one_step").style.display = "block";
+    document.getElementById("play").style.display = "block";
+    document.getElementById("steps").innerText = `Number of steps : ${steps}`;
 }
 
 function init() {
@@ -24,9 +31,9 @@ function init() {
     hide_inputs();
     load_grid(rows, columns);
     let temp;
-    for (let y = 0; y < columns; y++) {
+    for (let y = 0; y < rows; y++) {
         temp = [];
-        for (let x = 0; x < rows; x++) {
+        for (let x = 0; x < columns; x++) {
             temp.push(0)
         }
         grid.push(temp);
@@ -125,10 +132,24 @@ function add_step() {
         new_grid.push(temp);
     }
     grid = new_grid;
+    steps ++
+    document.getElementById("steps").innerText = `Number of steps : ${steps}`;
     refresh_grid(new_grid);
 }
 
+function play() {
+    document.getElementById("play").style.display = "none";
+    document.getElementById("stop").style.display = "block";
+    interval = window.setInterval(() => {
+        add_step();
+    }, 500);
+}
 
+function stop_interval() {
+    document.getElementById("play").style.display = "block";
+    document.getElementById("stop").style.display = "none";
+    clearInterval(interval);
+}
 function set_pulsar() {
     hide_inputs();
     rows = 17;
@@ -152,6 +173,34 @@ function set_pulsar() {
         [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+    refresh_grid(grid)
+}
+
+function set_penta() {
+    hide_inputs();
+    rows = 18;
+    columns = 11;
+    load_grid(rows, columns);
+    grid = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
     refresh_grid(grid)
 }
