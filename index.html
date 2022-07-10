@@ -11,8 +11,10 @@
     <h1>
         Game of Life
     </h1>
-    <input type="number" placeholder="rows" id="rows" value="5">
-    <input type="number" placeholder="columns" id="columns" value="5">
+    <label for="rows" class="rows">Rows :</label>
+    <input type="number" placeholder="rows" name="rows" class="rows" id="rows" value="5">
+    <label for="columns" class="columns">Columns :</label>
+    <input type="number" placeholder="columns" name="columns" class="columns" id="columns" value="5">
     <button id="validate">Valider</button>
     <button id="one_step">Step + 1</button>
     <button id="play">Play</button>
@@ -23,4 +25,5 @@
 
 </body>
 <script src="main.js"></script>
+<script src="grid.js"></script>
 </html>

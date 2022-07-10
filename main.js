@@ -1,70 +1,76 @@
 "use strict";
 
-/*
-0 -> dead -> white
-1 -> live -> black
-*/
+// 0 = dead = white
+// 1 = alive = black
 
+let grid;
 let interval;
-let steps = 0;
 
-document.getElementById("one_step").addEventListener("click", add_step);
-document.getElementById("validate").addEventListener("click", init);
+document.getElementById("validate").addEventListener("click", init)
+document.getElementById("one_step").addEventListener("click", addStep)
 document.getElementById("play").addEventListener("click", play);
 document.getElementById("stop").addEventListener("click", stop_interval);
 
-let grid = [];
-let rows;
-let columns;
 
-function hide_inputs() {
-    document.getElementById("rows").style.display = "none";
-    document.getElementById("columns").style.display = "none";
-    document.getElementById("validate").style.display = "none";
+function getSize() {
+    let width = document.getElementById("columns").value;
+    let height = document.getElementById("rows").value;
+    return [parseInt(width), parseInt(height)];
+}
+
+function hideInputs() {
+    hideList(document.getElementsByClassName("rows"));
+    hideList(document.getElementsByClassName("columns"));
+    document.getElementById("validate").style.display = "none"
+}
+
+function hideList(list) {
+    for (let element of list) {
+        element.style.display = "none"
+    }
+}
+
+function displayControls() {
     document.getElementById("one_step").style.display = "block";
-    document.getElementById("play").style.display = "block";
-    document.getElementById("steps").innerText = `Number of steps : ${steps}`;
+    document.getElementById("play").style.display = "block"
 }
 
 function init() {
-    get_size();
-    hide_inputs();
-    load_grid(rows, columns);
-    let temp;
-    for (let y = 0; y < rows; y++) {
-        temp = [];
-        for (let x = 0; x < columns; x++) {
-            temp.push(0)
-        }
-        grid.push(temp);
-    }
+    grid = new Grid(...getSize())
+    hideInputs();
+    displayControls();
+    refreshStepsNumber();
+    createGrid(grid)
 }
 
-function get_size() {
-    let rows_button = document.getElementById("rows");
-    let columns_button = document.getElementById("columns");
-    rows = parseInt(rows_button.value);
-    columns = parseInt(columns_button.value);
+function refreshStepsNumber() {
+    document.getElementById("steps").innerText = `Number of steps : ${grid.getSteps()}`;
 }
 
-function load_grid(rows, columns) {
+function addStep() {
+    grid.addStep();
+    refreshGrid(grid);
+    refreshStepsNumber();
+}
+
+function createGrid(grid) {
     let line;
-    let grid = document.getElementById("grid");
-    for (let y=0; y < rows; y++) {
+    let game = document.getElementById("grid");
+    for (let y=0; y < grid.height; y++) {
         line = document.createElement("div");
-        for (let x = 0; x < columns; x++) {
-            line.innerHTML += `<div class="cell white" id="${x}-${y}" onclick=click_on_cell(event)></div>`;
+        for (let x = 0; x < grid.width; x++) {
+            line.innerHTML += `<div class="cell white" id="${x}-${y}" onclick="clickOnCell(event)"></div>`;
         }
-        grid.appendChild(line);
+        game.appendChild(line);
     }
 }
 
-function refresh_grid(grid) {
+function refreshGrid(grid) {
     let cell;
-    for(let y=0; y < rows; y++) {
-        for(let x=0; x < columns; x++) {
+    for(let y=0; y < grid.height; y++) {
+        for(let x=0; x < grid.width; x++) {
             cell = document.getElementById(`${x}-${y}`);
-            if (grid[y][x] == 0) {
+            if (grid.grid[y][x] == 0) {
                 cell.className = "cell white";
             } else {
                 cell.className = "cell black";
@@ -73,75 +79,27 @@ function refresh_grid(grid) {
     }
 }
 
-function get_coords(cell) {
-    let id = cell.id
+function clickOnCell(event) {
+    let [x, y] = getCoords(event.target);
+    grid.reverseStatus(x, y);
+    refreshGrid(grid);
+}
+
+function getCoords(cell) {
+    let id = cell.id;
     id = id.split("-");
     let x = parseInt(id[0]);
     let y = parseInt(id[1]);
     return [x, y]
 }
 
-function click_on_cell(event) {
-    return change_status(event.target)
-}
-
-function change_status(cell) {
-    let [x, y] = get_coords(cell);
-    grid[y][x] = grid[y][x] == 1 ? 0 : 1;
-    refresh_grid(grid);
-}
-
-function click_on_cell(event) {
-    return change_status(event.target);
-}
-
-function get_arround(x, y) {
-    let neighbors = [
-        [x - 1, y - 1],
-        [x, y - 1],
-        [x + 1, y - 1],
-        [x + 1, y],
-        [x + 1, y + 1],
-        [x, y + 1],
-        [x - 1, y + 1],
-        [x - 1, y]
-    ]
-    let status = [];
-    neighbors.forEach(cell => {
-        let [xi, yi] = cell;    
-        if (0 <= xi && xi < columns && 0 <= yi && yi < rows) {
-            status.push(grid[yi][xi]);
-        }
-    });
-    return status;
-}
-
-function add_step() {
-    let new_grid = [];
-    let arround;
-    let cells_alive = 0;
-    for (let y=0; y < rows; y++) {
-        let temp = [];
-        for (let x=0; x < columns; x++) {
-            arround = get_arround(x, y);
-            cells_alive = arround.reduce((prev, current) => {
-                return current == 1 ? prev + 1 : prev
-            }, 0);
-            temp.push(Number((cells_alive == 3) || (grid[y][x] == 1 && cells_alive == 2)))
-        }
-        new_grid.push(temp);
-    }
-    grid = new_grid;
-    steps ++
-    document.getElementById("steps").innerText = `Number of steps : ${steps}`;
-    refresh_grid(new_grid);
-}
-
 function play() {
     document.getElementById("play").style.display = "none";
     document.getElementById("stop").style.display = "block";
     interval = window.setInterval(() => {
-        add_step();
+        grid.addStep();
+        refreshGrid(grid);
+        refreshStepsNumber();
     }, 500);
 }
 
@@ -149,58 +107,4 @@ function stop_interval() {
     document.getElementById("play").style.display = "block";
     document.getElementById("stop").style.display = "none";
     clearInterval(interval);
-}
-function set_pulsar() {
-    hide_inputs();
-    rows = 17;
-    columns = 17;
-    load_grid(rows, columns);
-    grid = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-    refresh_grid(grid)
-}
-
-function set_penta() {
-    hide_inputs();
-    rows = 18;
-    columns = 11;
-    load_grid(rows, columns);
-    grid = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-    refresh_grid(grid)
 }
