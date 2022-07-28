@@ -1,4 +1,10 @@
 class Grid {
+    
+    /**
+     * Constructor
+     * @param {number} width - width of the grid 
+     * @param {number} height - height of the grid
+     */
     constructor(width, height) {
         this.width = width;
         this.height = height;
@@ -6,6 +12,12 @@ class Grid {
         this.steps = 0;
     }
 
+    /**
+     * Create an empty grid of a specific size
+     * @param {number} width 
+     * @param {number} height 
+     * @returns {Array[Array[number]]}
+     */
     createGrid(width, height) {
         let grid = [];
         let line;
@@ -16,13 +28,27 @@ class Grid {
             }
             grid.push(line);
         }
-        return grid
+        return grid;
     }
 
-    changeStatus(x, y) {
+    /**
+     * As a cell can be dead of alive, this function
+     * change a cell status from one to the other
+     * @param {number} x - abscissa of the cell
+     * @param {number} y - ordinate of the cell
+     * @returns {number} the new status of the cell
+     */
+    reverseStatus(x, y) {
         this.grid[y][x] = this.grid[y][x] == 1 ? 0 : 1;
+        return this.grid[y][x]
     }
 
+    /**
+     * Get all neighors cells status
+     * @param {number} x
+     * @param {number} y 
+     * @returns {Array[number]}
+     */
     getNeighors(x, y) {
         let neighborsCoords = [
             [x - 1, y - 1],
@@ -43,7 +69,10 @@ class Grid {
         });
         return neighbors;
     }
-    
+
+    /**
+     * Update the whole grid according to Conway's rules
+     */
     addStep() {
         let grid = [];
         let neighbors;
@@ -64,20 +93,28 @@ class Grid {
         this.setSteps(this.getSteps() + 1);
     }
 
+    /**
+     * Change the number of steps
+     * @param {number} value 
+     * @returns {number} the new value
+     */
     setSteps(value) {
         this.steps = value;
-        return this.steps
+        return this.steps;
     }
 
+    /**
+     * Get the number of steps
+     * @returns {number}
+     */
     getSteps() {
         return this.steps;
     }
-    
-    reverseStatus(x, y) {
-        this.grid[y][x] = this.grid[y][x] == 1 ? 0 : 1
-    }
 
+    /**
+     * Replace the actual grid by a new one completly empty
+     */
     reset() {
-        this.grid = this.createGrid(this.width, this.height)
+        this.grid = this.createGrid(this.width, this.height);
     }
 }
