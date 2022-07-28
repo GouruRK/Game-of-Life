@@ -40,3 +40,7 @@ html, body {
 #stop {
     display: none;
 }
+
+#reset {
+    display: none;
+}

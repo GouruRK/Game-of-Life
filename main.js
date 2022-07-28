@@ -9,7 +9,8 @@ let interval;
 document.getElementById("validate").addEventListener("click", init)
 document.getElementById("one_step").addEventListener("click", addStep)
 document.getElementById("play").addEventListener("click", play);
-document.getElementById("stop").addEventListener("click", stop_interval);
+document.getElementById("stop").addEventListener("click", stopInterval);
+document.getElementById("reset").addEventListener("click", reset);
 
 
 function getSize() {
@@ -33,6 +34,7 @@ function hideList(list) {
 function displayControls() {
     document.getElementById("one_step").style.display = "block";
     document.getElementById("play").style.display = "block"
+    document.getElementById("reset").style.display = "block"
 }
 
 function init() {
@@ -103,8 +105,24 @@ function play() {
     }, 500);
 }
 
-function stop_interval() {
+function stopInterval() {
     document.getElementById("play").style.display = "block";
     document.getElementById("stop").style.display = "none";
     clearInterval(interval);
+}
+
+function reset() {
+    stopInterval();
+    grid.reset();
+    deleteGrid();
+    createGrid(grid);
+    grid.setSteps(0);
+    refreshStepsNumber();
+}
+
+function deleteGrid() {
+    let parent = document.getElementById("grid");
+    while (parent.lastChild) {
+        parent.removeChild(parent.lastChild);
+    }
 }

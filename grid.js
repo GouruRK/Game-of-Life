@@ -2,16 +2,21 @@ class Grid {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.grid = [];
+        this.grid = this.createGrid(width, height);
         this.steps = 0;
+    }
+
+    createGrid(width, height) {
+        let grid = [];
         let line;
         for (let y = 0; y < height; y++) {
             line = [];
             for (let x = 0; x < width; x++) {
                 line.push(0)
             }
-            this.grid.push(line);
+            grid.push(line);
         }
+        return grid
     }
 
     changeStatus(x, y) {
@@ -56,7 +61,12 @@ class Grid {
             grid.push(line);
         }
         this.grid = grid;
-        this.steps ++;
+        this.setSteps(this.getSteps() + 1);
+    }
+
+    setSteps(value) {
+        this.steps = value;
+        return this.steps
     }
 
     getSteps() {
@@ -65,5 +75,9 @@ class Grid {
     
     reverseStatus(x, y) {
         this.grid[y][x] = this.grid[y][x] == 1 ? 0 : 1
+    }
+
+    reset() {
+        this.grid = this.createGrid(this.width, this.height)
     }
 }
